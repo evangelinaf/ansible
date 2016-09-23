@@ -1,0 +1,35 @@
+- name: Configure server
+  hosts: localhost
+  sudo: True
+  vars:
+    enabled_file: /etc/nginx/sites-available/elasticbeanstalk-nginx-docker-proxy.conf
+    conf_file: /etc/nginx/nginx.conf 
+    proxy_file: /etc/nginx/conf.d/
+    server_name: localhost
+  tasks:
+    - name: Install datadog
+      shell: 'DD_API_KEY=3d9389290b05606c5978b888bb6645c2 bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"'
+    - name: create directories for nginx sites-available
+      file: path=/etc/nginx/sites-available state=directory
+    - name: create directories for nginx sites-enabled 
+      file: path=/etc/nginx/sites-enabled state=directory
+    - name: create nginx logs
+      file: path=/var/log/nginx/error.log state=touch
+    - name: copy sites-available file
+      copy: src=files/elasticbeanstalk-nginx-docker-proxy.conf dest=/etc/nginx/sites-available
+      notify: restart nginx
+    - name: copy nginx.conf
+      copy: src=files/nginx.conf dest={{ conf_file }}
+      notify: restart nginx
+    - name: copy proxy.conf
+      copy: src=files/proxy.conf dest={{ proxy_file }}
+      notify: restart nginx
+    - name: copy docker file
+      copy: src=files/elasticbeanstalk-nginx-docker-upstream.conf dest={{ proxy_file }}
+      notify: restart nginx
+    - name: enable configuration
+      file: dest=/etc/nginx/sites-enabled/elasticbeanstalk-nginx-docker-proxy.conf src={{ enabled_file }} state=link
+      notify: restart nginx
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted

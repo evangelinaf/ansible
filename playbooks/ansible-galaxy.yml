@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Install Datadog role
+      sudo: True
+      command: ansible-galaxy install Datadog.datadog

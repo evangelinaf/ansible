@@ -1,0 +1,3 @@
+- hosts: localhost
+  roles:
+    - { role: Datadog.datadog, sudo: yes, datadog_api_key: "6505b7be23dec3cb6d32d4b53c955a51" }

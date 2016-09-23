@@ -1,0 +1,4 @@
+#[localhost]
+#localhost	ansible_connection=local
+[webservers]
+datadog ansible_ssh_host=ec2-54-227-191-28.compute-1.amazonaws.com ansible_ssh_port=22
